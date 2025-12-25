@@ -11,10 +11,10 @@
                 [5] = true   -- section 5 uses echo
             })
 
-            -- Register your sounds (only echo versions are required in sound/echo/)
+            -- Register your sounds (only echo versions are required in YOUR-EPISODE/sound/echo/)
             -- If no custom normal sound exists, it uses the base SMBX sound
-            SectionReverb.register(14, "coin")  -- uses base SMBX coin + sound/echo/coin.ogg
-            SectionReverb.register(1, "jump")   -- or sound/jump.ogg + sound/echo/jump.ogg if both exist
+            SectionReverb.register(14, "coin")  -- uses base SMBX coin +  YOUR-EPISODEsound/echo/coin.ogg
+            SectionReverb.register(1, "jump")   -- or  YOUR-EPISODE/sound/jump.ogg +  YOUR-EPISODE/sound/echo/jump.ogg if both exist
 
             Tbh you should register ALL of your sounds in some other lua file then load that to say which sfx will make use of this library
         end
