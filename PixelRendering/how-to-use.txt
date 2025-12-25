@@ -1,0 +1,19 @@
+local pixel_rendering = require("pixel_rendering")
+
+local screen_width = 512;
+local screen_height = 448;
+
+function onStart()
+    Graphics.setMainFramebufferSize(screen_width,screen_height)
+    camera.width,camera.height = Graphics.getMainFramebufferSize()
+end
+
+function onCameraUpdate()
+    camera.width,camera.height = Graphics.getMainFramebufferSize()
+end
+
+pixel_rendering.init({
+    width = screen_width,
+    height = screen_height,
+    pixelSize = 2 -- 2 should be awlays the default value
+})

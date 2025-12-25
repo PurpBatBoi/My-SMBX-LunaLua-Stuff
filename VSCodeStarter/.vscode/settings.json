@@ -1,0 +1,13 @@
+{
+    "Lua.addonManager.enable": true, // If the addon manager wasn't working, turn this on manually
+    "Lua.type.inferParamType": true, // This might help improve diagnostic information
+    "Lua.runtime.version": "LuaJIT", // The version of lua that LunaLua is based on
+    
+    "Lua.runtime.plugin": "C:/Users/Admin/AppData/Roaming/Code/User/globalStorage/sumneko.lua/addonManager/addons/smbx2-lunalua/module/plugin.lua",
+
+    "Lua.workspace.library": [
+        "C:/Users/Admin/AppData/Roaming/Code/User/globalStorage/sumneko.lua/addonManager/addons/smbx2-lunalua/module/library",
+        "C:/Users/Admin/AppData/Roaming/Code/User/globalStorage/sumneko.lua/addonManager/addons/lpeg/module/library"
+    ],
+ 
+}
