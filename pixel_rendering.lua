@@ -1,9 +1,13 @@
 local pixel_rendering = {}
 
--- Scene capture priority (Blocks, NPCs, Player)
-pixel_rendering.renderPriority = -4
--- Background capture priority (Just the sky/image)
-pixel_rendering.bgPriority = -100
+-- Rendering Configuration
+-- -100: Backgrounds (HD)
+-- -99 to -5: Gameplay Objects (Pixelated)
+-- -4: Buffer Draw (Result)
+-- -3 to 0: HUD/UI (HD)
+pixel_rendering.LAYER_START = -99
+pixel_rendering.LAYER_END = -5
+pixel_rendering.DRAW_PRIORITY = -4
 
 pixel_rendering.config = {
     width = 800,
@@ -11,8 +15,8 @@ pixel_rendering.config = {
     pixelSize = 2
 }
 
+-- Internal resources
 local screenBuffer
-local bgBuffer -- New buffer for the HD background
 local shader
 
 local function mergeConfig(userConfig)
@@ -31,11 +35,6 @@ function pixel_rendering.init(config)
         screenBuffer = Graphics.CaptureBuffer(pixel_rendering.config.width, pixel_rendering.config.height)
     end
     
-    -- Initialize the Background Buffer
-    if not bgBuffer then
-        bgBuffer = Graphics.CaptureBuffer(pixel_rendering.config.width, pixel_rendering.config.height)
-    end
-    
     if not shader then
         shader = Shader()
         shader:compileFromFile(nil, "pixel_rendering.frag")
@@ -43,32 +42,34 @@ function pixel_rendering.init(config)
 end
 
 function pixel_rendering.onInitAPI()
+    registerEvent(pixel_rendering, "onTick")
     registerEvent(pixel_rendering, "onDraw")
 end
 
-function pixel_rendering.getviewportsize()
-    return pixel_rendering.config.width, pixel_rendering.config.height
+function pixel_rendering.onTick()
+    if not screenBuffer then return end
+
+    -- Reset buffer transparency
+    screenBuffer:clear(0)
+    
+    -- Redirect standard gameplay layers to the off-screen buffer
+    Graphics.redirectCameraFB(screenBuffer, pixel_rendering.LAYER_START, pixel_rendering.LAYER_END)
 end
 
 function pixel_rendering.onDraw()
-    -- 1. Capture ONLY the background (HD Reference)
-    bgBuffer:captureAt(pixel_rendering.bgPriority)
+    if not shader or not screenBuffer then return end
+
+    local cam = Camera.get()[1]
     
-    -- 2. Capture the Scene (Pixelated Target)
-    screenBuffer:captureAt(pixel_rendering.renderPriority)
-    
-    local w, h = pixel_rendering.getviewportsize()
-    local cam = Camera.get()[1] 
-    
+    -- Draw the processed gameplay layer over the HD background
     Graphics.drawScreen{
         texture = screenBuffer,
         shader = shader,
-        priority = pixel_rendering.renderPriority,
+        priority = pixel_rendering.DRAW_PRIORITY,
         uniforms = {
-            iResolution = {w, h},
+            iResolution = {pixel_rendering.config.width, pixel_rendering.config.height},
             iPixelSize = pixel_rendering.config.pixelSize,
-            iCamPos = {cam.x, cam.y},
-            iBgTexture = bgBuffer -- Send the HD background to the shader
+            iCamPos = {cam.x, cam.y}
         }
     }
 end
